@@ -1,8 +1,8 @@
 {
   "name": "jyotisha-astro",
   "version": "1.0.0",
+  "type": "module",
   "description": "Jyotisha — AI Astrology Web App by Akshay Shenoy",
-  "main": "api/reading.js",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.0"
   }
