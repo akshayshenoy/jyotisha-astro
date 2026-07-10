@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Jyotisha — AI-powered Vedic & Western astrology readings. Enter your birth details for personalised horoscope, karma, love and career readings." />
+<title>Jyotisha — Your Cosmic Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+<style>
+/* ── Reset & Tokens ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:     #0e0b1a;
+  --paper:   #f7f4ef;
+  --paper2:  rgba(247,244,239,0.65);
+  --paper3:  rgba(247,244,239,0.4);
+  --paper4:  rgba(247,244,239,0.08);
+  --gold:    #c9a84c;
+  --gold2:   #f0d898;
+  --violet:  #6b4fa0;
+  --violet2: #9b7dd4;
+  --border:  rgba(247,244,239,0.1);
+  --serif:   'Cormorant Garamond', Georgia, serif;
+  --sans:    'DM Sans', system-ui, sans-serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: #07050f;
+  color: var(--paper);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Stars ── */
+.sky {
+  position: fixed; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse at 25% 10%, #1c0f40 0%, #090614 55%, #03020a 100%);
+}
+.sky canvas { position: absolute; inset: 0; }
+
+/* ── Nebula glow ── */
+.nebula {
+  position: fixed; z-index: 0; pointer-events: none;
+  width: 800px; height: 800px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(107,79,160,0.12) 0%, transparent 70%);
+  top: -200px; left: 50%; transform: translateX(-50%);
+}
+
+/* ── Page ── */
+.page { position: relative; z-index: 1; }
+
+/* ── Nav ── */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid rgba(247,244,239,0.06);
+  backdrop-filter: blur(8px);
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(7,5,15,0.6);
+}
+.nav-logo { font-family: var(--serif); font-size: 22px; font-weight: 400; letter-spacing: 1px; color: var(--gold2); }
+.nav-logo span { opacity: 0.5; font-size: 13px; margin-left: 8px; font-family: var(--sans); font-weight: 300; }
+.nav-right { font-size: 12px; color: var(--paper3); letter-spacing: 0.5px; }
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  padding: 90px 24px 70px;
+  max-width: 720px; margin: 0 auto;
+}
+.eyebrow {
+  font-size: 10px; letter-spacing: 3.5px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.eyebrow::before, .eyebrow::after { content:''; width: 40px; height: 1px; background: var(--gold); opacity: 0.35; }
+h1 {
+  font-family: var(--serif); font-size: clamp(48px,9vw,82px);
+  font-weight: 300; line-height: 1.0; letter-spacing: -1.5px;
+  margin-bottom: 20px;
+}
+h1 em { font-style: italic; color: var(--gold2); }
+.hero-sub {
+  font-size: 15px; color: var(--paper3); line-height: 1.75;
+  max-width: 460px; margin: 0 auto 40px;
+}
+.zodiac {
+  display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;
+  font-size: 21px; opacity: 0.18; letter-spacing: 3px;
+}
+
+/* ── Form ── */
+.form-outer { max-width: 620px; margin: 0 auto; padding: 0 20px 70px; }
+.card {
+  background: rgba(247,244,239,0.045);
+  border: 1px solid rgba(247,244,239,0.1);
+  border-radius: 22px; padding: 38px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 48px rgba(0,0,0,0.35);
+}
+.section-lbl {
+  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-lbl::after { content:''; flex:1; height:1px; background: rgba(201,168,76,0.18); }
+.g3 { display: grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
+.g2 { display: grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:10px; letter-spacing:1.2px; text-transform:uppercase; color:var(--paper3); }
+.field select, .field input {
+  font-family:var(--sans); font-size:14px;
+  background: rgba(247,244,239,0.06);
+  border: 1px solid rgba(247,244,239,0.12);
+  border-radius:10px; padding:11px 14px; color:var(--paper);
+  outline:none; transition: border-color 0.2s, background 0.2s; width:100%;
+  -webkit-appearance:none; appearance:none;
+}
+.field select:focus, .field input:focus {
+  border-color: rgba(201,168,76,0.45);
+  background: rgba(247,244,239,0.09);
+}
+.field select option { background:#120d24; }
+.field input::placeholder { color:rgba(247,244,239,0.2); }
+.divider { height:1px; background: rgba(247,244,239,0.07); margin: 26px 0; }
+
+/* Language pills */
+.lang-pills { display:flex; gap:7px; flex-wrap:wrap; margin-top:14px; }
+.lp {
+  font-size:12px; padding:6px 15px;
+  background:transparent; border:1px solid rgba(247,244,239,0.14);
+  border-radius:20px; color:var(--paper3); cursor:pointer;
+  transition:all 0.2s; font-family:var(--sans);
+}
+.lp:hover { border-color: rgba(201,168,76,0.35); color:var(--gold2); }
+.lp.on { background:rgba(201,168,76,0.13); border-color:rgba(201,168,76,0.4); color:var(--gold2); }
+
+.submit-btn {
+  width:100%; margin-top:26px;
+  background: linear-gradient(135deg, #c9a84c 0%, #e8c05a 50%, #c9a84c 100%);
+  background-size: 200% 100%;
+  color:#0e0b1a; border:none; border-radius:13px;
+  padding:16px 28px; font-family:var(--sans); font-size:15px; font-weight:500;
+  cursor:pointer; letter-spacing:0.3px;
+  transition: opacity 0.2s, transform 0.15s, background-position 0.4s;
+  display:flex; align-items:center; justify-content:center; gap:9px;
+}
+.submit-btn:hover { opacity:0.9; transform:translateY(-2px); background-position:100% 0; }
+.submit-btn:active { transform:translateY(0); }
+.submit-btn:disabled { opacity:0.3; cursor:not-allowed; transform:none; }
+.submit-btn .star { font-size:17px; }
+
+/* ── Result ── */
+.result-outer { max-width:780px; margin:0 auto; padding:0 20px 80px; display:none; }
+
+/* Sign header */
+.sign-hdr {
+  display:flex; align-items:flex-start; gap:22px;
+  background: linear-gradient(135deg, rgba(107,79,160,0.22) 0%, rgba(61,143,143,0.1) 100%);
+  border:1px solid rgba(107,79,160,0.3);
+  border-radius:20px; padding:28px 30px; margin-bottom:18px;
+}
+.glyph-orb {
+  width:76px; height:76px; flex-shrink:0;
+  background: linear-gradient(135deg, var(--violet) 0%, var(--violet2) 100%);
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:34px; box-shadow:0 8px 28px rgba(107,79,160,0.45);
+}
+.sign-title { font-family:var(--serif); font-size:27px; font-weight:400; letter-spacing:-0.3px; margin-bottom:5px; }
+.sign-meta { font-size:13px; color:var(--paper3); margin-bottom:12px; }
+.traits { display:flex; gap:7px; flex-wrap:wrap; }
+.trait {
+  font-size:11px; letter-spacing:0.3px;
+  background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.22);
+  border-radius:20px; padding:4px 12px; color:var(--gold2);
+}
+
+/* Planets */
+.planets-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:22px; }
+.planet {
+  background:var(--paper4); border:1px solid rgba(247,244,239,0.08);
+  border-radius:14px; padding:14px 8px; text-align:center;
+  transition:background 0.2s, transform 0.2s;
+  cursor:default;
+}
+.planet:hover { background:rgba(247,244,239,0.1); transform:translateY(-2px); }
+.p-sym { font-size:20px; display:block; margin-bottom:5px; }
+.p-name { font-size:10px; color:var(--paper3); letter-spacing:0.4px; text-transform:uppercase; }
+.p-sign { font-size:12px; font-weight:500; color:var(--gold2); margin-top:3px; }
+
+/* Tabs */
+.tabs {
+  display:flex; background:var(--paper4);
+  border:1px solid var(--border); border-radius:14px;
+  overflow:hidden; margin-bottom:18px;
+}
+.tab {
+  flex:1; padding:12px 6px; font-family:var(--sans); font-size:12px;
+  letter-spacing:0.3px; background:transparent; border:none;
+  color:var(--paper3); cursor:pointer;
+  border-right:1px solid var(--border); transition:all 0.22s;
+}
+.tab:last-child { border-right:none; }
+.tab.on {
+  background:linear-gradient(135deg, var(--violet) 0%, var(--violet2) 100%);
+  color:var(--paper); font-weight:500;
+}
+.tab:not(.on):hover { background:rgba(247,244,239,0.07); color:var(--paper); }
+
+/* Reading */
+.reading {
+  background:var(--paper4); border:1px solid var(--border);
+  border-radius:20px; padding:30px; margin-bottom:16px;
+}
+.r-lbl {
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--gold); margin-bottom:18px;
+  display:flex; align-items:center; gap:10px;
+}
+.r-lbl::after { content:''; flex:1; height:1px; background:rgba(201,168,76,0.18); }
+.r-text {
+  font-family:var(--serif); font-size:18.5px; font-weight:300;
+  color:rgba(247,244,239,0.87); line-height:1.88;
+}
+.r-text p { margin-bottom:18px; }
+.r-text p:last-child { margin-bottom:0; }
+
+/* Elements */
+.elem-card {
+  background:rgba(247,244,239,0.03); border:1px solid rgba(247,244,239,0.07);
+  border-radius:18px; padding:24px; margin-bottom:16px;
+}
+.meter { margin-bottom:13px; }
+.meter:last-child { margin-bottom:0; }
+.m-top { display:flex; justify-content:space-between; font-size:12px; color:var(--paper3); margin-bottom:5px; }
+.m-track { height:3px; background:rgba(247,244,239,0.09); border-radius:2px; }
+.m-fill { height:3px; border-radius:2px; transition:width 1s ease; }
+.m-fill.fire  { background:linear-gradient(90deg,#e85d3a,#f0a060); }
+.m-fill.earth { background:linear-gradient(90deg,#4a8c5c,#a0c878); }
+.m-fill.water { background:linear-gradient(90deg,#3a6ea8,#78b4d8); }
+.m-fill.air   { background:linear-gradient(90deg,#8c7ad4,var(--violet2)); }
+
+/* Loading */
+.loading { text-align:center; padding:52px 20px; }
+.orbit {
+  width:46px; height:46px; margin:0 auto 18px;
+  border:2px solid rgba(201,168,76,0.15);
+  border-top-color:var(--gold); border-radius:50%;
+  animation:spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.load-text { font-family:var(--serif); font-size:19px; font-style:italic; color:var(--paper3); }
+
+/* Error */
+.err {
+  background:rgba(196,99,122,0.1); border:1px solid rgba(196,99,122,0.25);
+  border-radius:12px; padding:18px; color:#e8a0b0; font-size:14px; line-height:1.6;
+}
+
+/* ── Footer ── */
+footer {
+  position:relative; z-index:1;
+  text-align:center; padding:40px 20px 50px;
+  border-top:1px solid rgba(247,244,239,0.06);
+}
+.footer-logo { font-family:var(--serif); font-size:20px; color:var(--gold2); opacity:0.7; margin-bottom:8px; }
+.footer-by { font-size:12px; color:var(--paper3); margin-bottom:10px; letter-spacing:0.3px; }
+.footer-by strong { color:var(--gold); font-weight:500; }
+.footer-note { font-size:11px; color:rgba(247,244,239,0.2); line-height:1.7; max-width:420px; margin:0 auto; }
+
+/* ── Responsive ── */
+@media (max-width:560px) {
+  .g3 { grid-template-columns:1fr 1fr; }
+  .planets-grid { grid-template-columns:repeat(3,1fr); }
+  .tabs { flex-wrap:wrap; }
+  .tab { flex:none; width:50%; border-bottom:1px solid var(--border); }
+  .tab:nth-child(2n) { border-right:none; }
+  .tab:nth-last-child(-n+1):nth-child(odd) { width:100%; }
+  .sign-hdr { flex-direction:column; align-items:center; text-align:center; }
+  .card { padding:24px 18px; }
+  nav { padding:16px 20px; }
+  .nav-right { display:none; }
+}
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
+</style>
+</head>
+<body>
+
+<div class="sky" id="sky"></div>
+<div class="nebula"></div>
+
+<div class="page">
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">Jyotisha <span>· ಜ್ಯೋತಿಷ</span></div>
+    <div class="nav-right">AI Astrology · Vedic & Western</div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="eyebrow">Vedic · Western · AI-Powered</div>
+    <h1>Your <em>cosmic</em><br>blueprint</h1>
+    <p class="hero-sub">Enter your birth details to receive a personalised reading — past karma, present sky, future cycles, love &amp; career.</p>
+    <div class="zodiac">♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓</div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-outer">
+    <div class="card">
+      <div class="section-lbl">Birth details</div>
+      <div class="g3">
+        <div class="field"><label>Day</label><select id="day"></select></div>
+        <div class="field">
+          <label>Month</label>
+          <select id="month">
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+        </div>
+        <div class="field"><label>Year</label><select id="year"></select></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label>Birth time</label><input type="time" id="btime" value="12:00" /></div>
+        <div class="field"><label>Your name</label><input type="text" id="uname" placeholder="e.g. Priya" maxlength="40" /></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-lbl">Reading language</div>
+      <div class="lang-pills">
+        <button class="lp on" data-l="en" onclick="setLang('en',this)">English</button>
+        <button class="lp" data-l="kn" onclick="setLang('kn',this)">ಕನ್ನಡ</button>
+        <button class="lp" data-l="hi" onclick="setLang('hi',this)">हिंदी</button>
+        <button class="lp" data-l="te" onclick="setLang('te',this)">తెలుగు</button>
+        <button class="lp" data-l="ta" onclick="setLang('ta',this)">தமிழ்</button>
+      </div>
+
+      <button class="submit-btn" id="goBtn">
+        <span class="star">✦</span> Reveal my chart
+      </button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-outer" id="resultOuter">
+    <div id="signHdr"></div>
+    <div id="planetsEl"></div>
+    <div class="tabs" id="tabsEl"></div>
+    <div id="tabContent"></div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">✦ Jyotisha</div>
+  <div class="footer-by">Created &amp; authorised by <strong>Akshay Shenoy</strong></div>
+  <div class="footer-note">AI-powered readings blending Vedic &amp; Western astrology traditions.<br>Intended for self-reflection. Not a substitute for professional guidance.</div>
+</footer>
+
+<script>
+/* ── Stars canvas ── */
+(function(){
+  const sky = document.getElementById('sky');
+  const c = document.createElement('canvas');
+  sky.appendChild(c);
+  const ctx = c.getContext('2d');
+  let W, H, stars = [];
+  function resize(){ W=c.width=window.innerWidth; H=c.height=window.innerHeight; }
+  function init(){
+    resize();
+    stars = Array.from({length:220},()=>({
+      x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*1.3+0.2,
+      a:Math.random(),
+      s:Math.random()*0.003+0.001,
+      gold:Math.random()<0.06
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.a+=s.s; if(s.a>1)s.s=-Math.abs(s.s); if(s.a<0)s.s=Math.abs(s.s);
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = s.gold
+        ? `rgba(201,168,76,${s.a*0.7})`
+        : `rgba(247,244,239,${s.a*0.75})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  init(); draw();
+  window.addEventListener('resize',()=>{ resize(); stars.forEach(s=>{s.x=Math.random()*W;s.y=Math.random()*H;}); });
+})();
+
+/* ── Dropdowns ── */
+const dayEl=document.getElementById('day');
+const yearEl=document.getElementById('year');
+for(let d=1;d<=31;d++){const o=document.createElement('option');o.value=d;o.textContent=d;dayEl.appendChild(o);}
+const CY=new Date().getFullYear();
+for(let y=CY;y>=1920;y--){const o=document.createElement('option');o.value=y;o.textContent=y;yearEl.appendChild(o);}
+yearEl.value=CY-25;
+
+/* ── Language ── */
+let LANG='en';
+function setLang(l,btn){
+  LANG=l;
+  document.querySelectorAll('.lp').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  Object.keys(cache).forEach(k=>delete cache[k]);
+}
+
+/* ── Signs ── */
+const SIGNS=[
+  {name:'Aries',    glyph:'♈',el:'Fire', ruler:'Mars',   traits:['Bold','Passionate','Leader','Impulsive']},
+  {name:'Taurus',   glyph:'♉',el:'Earth',ruler:'Venus',  traits:['Reliable','Sensual','Patient','Stubborn']},
+  {name:'Gemini',   glyph:'♊',el:'Air',  ruler:'Mercury',traits:['Curious','Witty','Adaptable','Restless']},
+  {name:'Cancer',   glyph:'♋',el:'Water',ruler:'Moon',   traits:['Nurturing','Intuitive','Protective','Moody']},
+  {name:'Leo',      glyph:'♌',el:'Fire', ruler:'Sun',    traits:['Generous','Confident','Loyal','Dramatic']},
+  {name:'Virgo',    glyph:'♍',el:'Earth',ruler:'Mercury',traits:['Analytical','Meticulous','Helpful','Modest']},
+  {name:'Libra',    glyph:'♎',el:'Air',  ruler:'Venus',  traits:['Diplomatic','Charming','Fair','Indecisive']},
+  {name:'Scorpio',  glyph:'♏',el:'Water',ruler:'Pluto',  traits:['Intense','Magnetic','Determined','Secretive']},
+  {name:'Sagittarius',glyph:'♐',el:'Fire',ruler:'Jupiter',traits:['Adventurous','Optimistic','Free','Blunt']},
+  {name:'Capricorn',glyph:'♑',el:'Earth',ruler:'Saturn', traits:['Ambitious','Disciplined','Practical','Reserved']},
+  {name:'Aquarius', glyph:'♒',el:'Air',  ruler:'Uranus', traits:['Independent','Visionary','Humanitarian','Eccentric']},
+  {name:'Pisces',   glyph:'♓',el:'Water',ruler:'Neptune',traits:['Empathetic','Dreamy','Compassionate','Intuitive']},
+];
+function sunSign(d,m){const c=[20,19,20,20,21,21,22,22,22,23,21,21];return SIGNS[d<=c[m-1]?(m+10)%12:m-1];}
+function moonSign(d,m,y){return SIGNS[(d*3+m*7+y)%12];}
+function risingSign(h,d,m){return SIGNS[(sunSign(d,m).name.length+Math.floor(h/2))%12];}
+function getPlanets(bd){
+  const t=Math.abs(bd.getTime());
+  return[
+    {sym:'☿',name:'Mercury',sign:SIGNS[(Math.floor(t/8640000)+7)%12]},
+    {sym:'♀',name:'Venus',  sign:SIGNS[(Math.floor(t/8640000)+2)%12]},
+    {sym:'♂',name:'Mars',   sign:SIGNS[(Math.floor(t/8640000)+4)%12]},
+    {sym:'♃',name:'Jupiter',sign:SIGNS[(Math.floor(t/8640000)+9)%12]},
+    {sym:'♄',name:'Saturn', sign:SIGNS[(Math.floor(t/8640000)+11)%12]},
+  ];
+}
+
+let CD=null, activeTab='past';
+const cache={};
+
+const TABS=['past','present','future','love','career'];
+const TAB_LABELS={
+  en:{past:'Past life',present:'Present',future:'Future',love:'Love',career:'Career'},
+  kn:{past:'ಹಿಂದಿನ ಜನ್ಮ',present:'ವರ್ತಮಾನ',future:'ಭವಿಷ್ಯ',love:'ಪ್ರೀತಿ',career:'ವೃತ್ತಿ'},
+  hi:{past:'पूर्व जन्म',present:'वर्तमान',future:'भविष्य',love:'प्रेम',career:'कैरियर'},
+  te:{past:'పూర్వ జన్మ',present:'వర్తమానం',future:'భవిష్యత్',love:'ప్రేమ',career:'వృత్తి'},
+  ta:{past:'முன் ஜன்மம்',present:'நிகழ்காலம்',future:'எதிர்காலம்',love:'காதல்',career:'தொழில்'},
+};
+const R_LABELS={
+  en:{past:'Karmic & past life reading',present:'Current cosmic weather',future:'Your path ahead',love:'Heart & relationships',career:'Purpose & abundance'},
+  kn:{past:'ಕರ್ಮ ಮತ್ತು ಹಿಂದಿನ ಜನ್ಮ ವಾಚನ',present:'ಈಗಿನ ಆಕಾಶ ಸ್ಥಿತಿ',future:'ನಿಮ್ಮ ಭವಿಷ್ಯದ ದಾರಿ',love:'ಹೃದಯ ಮತ್ತು ಸಂಬಂಧ',career:'ಉದ್ದೇಶ ಮತ್ತು ಸಮೃದ್ಧಿ'},
+  hi:{past:'कर्म और पूर्व जन्म वाचन',present:'वर्तमान ब्रह्मांडीय स्थिति',future:'आगे का मार्ग',love:'हृदय और रिश्ते',career:'उद्देश्य और समृद्धि'},
+  te:{past:'కర్మ మరియు పూర్వ జన్మ వాచనం',present:'ప్రస్తుత గ్రహ స్థితి',future:'మీ భవిష్యత్ మార్గం',love:'హృదయం మరియు సంబంధాలు',career:'ఉద్దేశ్యం మరియు సమృద్ధి'},
+  ta:{past:'கர்மா மற்றும் முன் ஜன்ம வாசிப்பு',present:'தற்போதைய கிரக நிலை',future:'எதிர்கால பாதை',love:'இதயம் மற்றும் உறவுகள்',career:'நோக்கம் மற்றும் செழிப்பு'},
+};
+const LOAD_MSGS={
+  en:{past:'Tracing karmic echoes…',present:'Reading your present sky…',future:'Scanning celestial trajectories…',love:'Aligning Venus and your heart…',career:'Consulting your Saturn path…'},
+  kn:{past:'ಕರ್ಮದ ಹೆಜ್ಜೆಗಳನ್ನು ಹಿಂಬಾಲಿಸುತ್ತಿದ್ದೇವೆ…',present:'ನಿಮ್ಮ ಈಗಿನ ಆಕಾಶ ಓದುತ್ತಿದ್ದೇವೆ…',future:'ಭವಿಷ್ಯದ ಗ್ರಹ ಮಾರ್ಗ ಅಳೆಯುತ್ತಿದ್ದೇವೆ…',love:'ಶುಕ್ರ ಮತ್ತು ಹೃದಯ ಜೋಡಿಸುತ್ತಿದ್ದೇವೆ…',career:'ನಿಮ್ಮ ಶನಿ ಮಾರ್ಗ ನೋಡುತ್ತಿದ್ದೇವೆ…'},
+  hi:{past:'कर्म के निशान खोज रहे हैं…',present:'वर्तमान आकाश पढ़ रहे हैं…',future:'भविष्य के ग्रह देख रहे हैं…',love:'शुक्र और हृदय जोड़ रहे हैं…',career:'शनि का पथ देख रहे हैं…'},
+  te:{past:'కర్మ చిహ్నాలు వెతుకుతున్నాం…',present:'ప్రస్తుత ఆకాశం చదువుతున్నాం…',future:'భవిష్యత్ గ్రహాలు చూస్తున్నాం…',love:'శుక్రుడు మరియు హృదయం కలుపుతున్నాం…',career:'శని మార్గం చూస్తున్నాం…'},
+  ta:{past:'கர்ம தடயங்களை தேடுகிறோம்…',present:'இப்போதைய வானம் படிக்கிறோம்…',future:'எதிர்கால கோள்கள் பார்க்கிறோம்…',love:'சுக்ரன் மற்றும் இதயம் இணைக்கிறோம்…',career:'சனியின் பாதை பார்க்கிறோம்…'},
+};
+
+/* ── Submit ── */
+document.getElementById('goBtn').addEventListener('click',()=>{
+  const d=parseInt(dayEl.value);
+  const m=parseInt(document.getElementById('month').value);
+  const y=parseInt(yearEl.value);
+  const [h,mi]=(document.getElementById('btime').value||'12:00').split(':').map(Number);
+  const name=document.getElementById('uname').value.trim()||'you';
+  const bd=new Date(y,m-1,d,h,mi);
+  Object.keys(cache).forEach(k=>delete cache[k]);
+  const pl=getPlanets(bd);
+  CD={name,d,m,y,h,mi,bd,age:CY-y,
+    sun:sunSign(d,m),moon:moonSign(d,m,y),rising:risingSign(h,d,m),pl};
+  renderShell();
+  loadTab('past');
+  setTimeout(()=>document.getElementById('resultOuter').scrollIntoView({behavior:'smooth',block:'start'}),100);
+});
+
+function renderShell(){
+  document.getElementById('resultOuter').style.display='block';
+  document.getElementById('signHdr').innerHTML=`
+    <div class="sign-hdr">
+      <div class="glyph-orb">${CD.sun.glyph}</div>
+      <div>
+        <div class="sign-title">${CD.sun.name} Sun · ${CD.moon.name} Moon · ${CD.rising.name} Rising</div>
+        <div class="sign-meta">${CD.sun.el} energy · Ruled by ${CD.sun.ruler} · Age ${CD.age}</div>
+        <div class="traits">${CD.sun.traits.map(t=>`<span class="trait">${t}</span>`).join('')}</div>
+      </div>
+    </div>`;
+  document.getElementById('planetsEl').innerHTML=`
+    <div class="planets-grid">${CD.pl.map(p=>`
+      <div class="planet">
+        <span class="p-sym">${p.sym}</span>
+        <div class="p-name">${p.name}</div>
+        <div class="p-sign">${p.sign.glyph} ${p.sign.name}</div>
+      </div>`).join('')}
+    </div>`;
+  const lbl=TAB_LABELS[LANG]||TAB_LABELS.en;
+  document.getElementById('tabsEl').innerHTML=TABS.map(t=>
+    `<button class="tab${t==='past'?' on':''}" data-t="${t}" onclick="switchTab('${t}',this)">${lbl[t]}</button>`
+  ).join('');
+}
+
+window.switchTab=function(tab,el){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  activeTab=tab;
+  if(cache[tab+LANG])showCached(tab); else loadTab(tab);
+};
+
+async function loadTab(tab){
+  activeTab=tab;
+  const msgs=LOAD_MSGS[LANG]||LOAD_MSGS.en;
+  document.getElementById('tabContent').innerHTML=`
+    <div class="reading loading">
+      <div class="orbit"></div>
+      <div class="load-text">${msgs[tab]}</div>
+    </div>`;
+  try{
+    const {name,d,m,y,h,mi,sun,moon,rising,pl,age}=CD;
+    const res=await fetch('/api/reading',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        tab,lang:LANG,name,d,m,y,h,mi,age,
+        sun:sun.name+' ('+sun.el+')',
+        moon:moon.name,
+        rising:rising.name,
+        planets:pl.map(p=>p.sign.name)
+      })
+    });
+    const data=await res.json();
+    if(!res.ok||data.error) throw new Error(data.error||'Server error');
+    cache[tab+LANG]=data.text;
+    if(activeTab===tab)showCached(tab);
+  }catch(e){
+    if(activeTab===tab)
+      document.getElementById('tabContent').innerHTML=
+        `<div class="err">⚠ ${e.message||'Could not load reading. Please try again.'}</div>`;
+  }
+}
+
+function showCached(tab){
+  const rl=R_LABELS[LANG]||R_LABELS.en;
+  const paras=cache[tab+LANG].split(/\n+/).filter(p=>p.trim()).map(p=>`<p>${p}</p>`).join('');
+  const extra=tab==='present'?elementsHTML():'';
+  document.getElementById('tabContent').innerHTML=
+    `<div class="reading"><div class="r-lbl">${rl[tab]}</div><div class="r-text">${paras}</div></div>${extra}`;
+}
+
+function elementsHTML(){
+  const c={Fire:0,Earth:0,Water:0,Air:0};
+  [CD.sun,CD.moon,CD.rising].forEach(s=>c[s.el]++);
+  return`<div class="elem-card"><div class="r-lbl">Elemental balance</div>${
+    Object.entries(c).map(([el,v])=>`
+      <div class="meter">
+        <div class="m-top"><span>${el}</span><span>${Math.round(v/3*100)}%</span></div>
+        <div class="m-track"><div class="m-fill ${el.toLowerCase()}" style="width:${Math.round(v/3*100)}%"></div></div>
+      </div>`).join('')}</div>`;
+}
+</script>
+</body>
+</html>
